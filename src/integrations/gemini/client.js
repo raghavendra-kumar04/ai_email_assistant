@@ -1,10 +1,16 @@
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 const logger = require('../../utils/logger');
+const { sleep } = require('../../utils/retry');
 
 let genAI = null;
 
-const DEFAULT_MODEL = 'gemini-3.6-flash';
-const FALLBACK_MODELS = ['gemini-3.6-flash', 'gemini-3.8-flash', 'gemini-3.5-flash', 'gemini-flash-latest'];
+const DEFAULT_MODEL = 'gemini-3.7-flash';
+const FALLBACK_MODELS = [
+  'gemini-3.7-flash',
+  'gemini-3.8-flash',
+  'gemini-flash-latest',
+  'gemini-3.5-flash'
+];
 
 function getGeminiClient() {
   if (!genAI) {
@@ -25,19 +31,30 @@ function getGeminiModel(modelName = DEFAULT_MODEL) {
 }
 
 /**
- * Generate content with automatic model fallback for maximum resilience
+ * Generate content with automatic model fallback and retry for maximum resilience
  */
 async function generateWithFallback(generateOptions) {
   const ai = getGeminiClient();
   let lastError;
 
   for (const modelName of FALLBACK_MODELS) {
-    try {
-      const model = ai.getGenerativeModel({ model: modelName });
-      return await model.generateContent(generateOptions);
-    } catch (err) {
-      lastError = err;
-      logger.warn(`Model ${modelName} encountered error (${err.status || err.message?.slice(0, 80)}). Trying fallback model...`);
+    for (let attempt = 1; attempt <= 2; attempt++) {
+      try {
+        const model = ai.getGenerativeModel({ model: modelName });
+        return await model.generateContent(generateOptions);
+      } catch (err) {
+        lastError = err;
+        const is503 = err.status === 503 || err.message?.includes('503') || err.message?.includes('Service Unavailable');
+        
+        if (is503 && attempt === 1) {
+          logger.warn(`Model ${modelName} returned 503. Retrying in 800ms...`);
+          await sleep(800);
+          continue;
+        }
+
+        logger.warn(`Model ${modelName} encountered error (${err.status || err.message?.slice(0, 80)}). Trying fallback model...`);
+        break;
+      }
     }
   }
 

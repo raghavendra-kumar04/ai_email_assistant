@@ -8,7 +8,13 @@
     "dev": "node --watch src/server.js",
     "check": "node scripts/check-build.js"
   },
-  "keywords": ["gmail", "gemini", "telegram", "ai", "email-assistant"],
+  "keywords": [
+    "gmail",
+    "gemini",
+    "telegram",
+    "ai",
+    "email-assistant"
+  ],
   "author": "",
   "license": "ISC",
   "dependencies": {
@@ -18,6 +24,7 @@
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
     "googleapis": "^144.0.0",
+    "groq-sdk": "^1.6.0",
     "helmet": "^8.0.0",
     "mongoose": "^8.9.5",
     "pino": "^9.6.0"

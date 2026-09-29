@@ -21,6 +21,14 @@ const gmailStateSchema = new mongoose.Schema(
     totalEmailsProcessed: {
       type: Number,
       default: 0
+    },
+    lastUserInteractionAt: {
+      type: Date,
+      default: null
+    },
+    lastUserGreetingAt: {
+      type: Date,
+      default: null
     }
   },
   {

@@ -39,6 +39,7 @@ async function runChecks() {
   assert('TELEGRAM_CHAT_ID configured', Boolean(env.TELEGRAM_CHAT_ID));
   assert('JOB_SECRET configured', Boolean(env.JOB_SECRET));
   assert('TELEGRAM_WEBHOOK_SECRET configured', Boolean(env.TELEGRAM_WEBHOOK_SECRET));
+  assert('GROQ_API_KEY configured (sub-second fast intent parsing)', Boolean(env.GROQ_API_KEY), true);
 
   const isMongoSet = env.MONGODB_URI && !env.MONGODB_URI.includes('<username>') && !env.MONGODB_URI.includes('<password>');
   assert(

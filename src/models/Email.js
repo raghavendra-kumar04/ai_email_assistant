@@ -79,6 +79,15 @@ const emailSchema = new mongoose.Schema(
       type: Boolean,
       default: false
     },
+    userSeen: {
+      type: Boolean,
+      default: false,
+      index: true
+    },
+    userSeenAt: {
+      type: Date,
+      default: null
+    },
 
     // 7-day Retention TTL
     expiresAt: {
