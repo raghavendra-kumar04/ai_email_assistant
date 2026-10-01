@@ -1,17 +1,22 @@
 const GmailState = require('../models/GmailState');
+const Email = require('../models/Email');
 const {
   fetchHistoryChanges,
   getCurrentHistoryId,
   searchEmails
 } = require('../integrations/gmail/fetcher');
 const { processEmailBatch } = require('../services/emailProcessor');
+const { sendMessage } = require('../integrations/telegram/sender');
+const { formatHourlyDigest } = require('../integrations/telegram/formatter');
 const logger = require('../utils/logger');
 
 /**
- * Polls Gmail for new emails since the last recorded historyId
+ * Polls Gmail for new emails since the last recorded historyId / 1-hour window
+ * Sends an hourly summary if new emails arrived, or stays silent if 0 emails arrived.
  */
-async function runEmailPollJob() {
-  logger.info('🔍 Starting periodic Gmail polling job...');
+async function runEmailPollJob(options = {}) {
+  const { sendHourlySummary = true } = options;
+  logger.info('🔍 Starting 1-hour periodic Gmail polling job...');
 
   const state = await GmailState.getState();
   state.lastPollAt = new Date();
@@ -41,33 +46,52 @@ async function runEmailPollJob() {
       }
     }
 
-    // 3. Process new emails (with immediate notification enabled for important emails)
-    let processedCount = 0;
+    // 3. Process new emails (with immediate alerts enabled for Important emails)
+    let processedDocs = [];
     if (messageIdsToProcess.length > 0) {
       logger.info(`Found ${messageIdsToProcess.length} new email(s) to process.`);
-      const processedDocs = await processEmailBatch(messageIdsToProcess, { shouldNotify: true });
-      processedCount = processedDocs.length;
+      processedDocs = await processEmailBatch(messageIdsToProcess, { shouldNotify: true });
     } else {
-      logger.info('No new emails found during this polling cycle.');
+      logger.info('✨ No new emails found during this 1-hour polling cycle. Staying silent.');
     }
 
-    // 4. Update Gmail state in MongoDB
+    // 4. If new emails were processed in this 1-hour cycle, send the Hourly Digest to Telegram
+    if (processedDocs.length > 0 && sendHourlySummary) {
+      try {
+        const hourlyDigestMessage = formatHourlyDigest(processedDocs);
+        if (hourlyDigestMessage) {
+          await sendMessage(hourlyDigestMessage);
+          logger.info(`📬 Sent Hourly Digest with ${processedDocs.length} new email(s) to Telegram`);
+        }
+
+        // Mark these emails as seen and included
+        const docIds = processedDocs.map((doc) => doc._id);
+        await Email.updateMany(
+          { _id: { $in: docIds } },
+          { $set: { userSeen: true, userSeenAt: new Date(), digestIncluded: true } }
+        );
+      } catch (tgErr) {
+        logger.error({ tgErr }, 'Failed to deliver hourly digest message to Telegram');
+      }
+    }
+
+    // 5. Update Gmail state in MongoDB
     state.lastHistoryId = nextHistoryId;
     state.lastSuccessfulPollAt = new Date();
-    state.totalEmailsProcessed = (state.totalEmailsProcessed || 0) + processedCount;
+    state.totalEmailsProcessed = (state.totalEmailsProcessed || 0) + processedDocs.length;
     await state.save();
 
     logger.info(
       {
-        processedCount,
+        processedCount: processedDocs.length,
         historyId: nextHistoryId
       },
-      '✅ Gmail polling job completed successfully'
+      '✅ 1-hour Gmail polling job completed successfully'
     );
 
     return {
       status: 'success',
-      processedCount,
+      processedCount: processedDocs.length,
       historyId: nextHistoryId
     };
   } catch (error) {

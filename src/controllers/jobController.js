@@ -3,11 +3,11 @@ const { runEmailPollJob } = require('../jobs/pollJob');
 const logger = require('../utils/logger');
 
 /**
- * Trigger morning digest job via external scheduler
+ * Trigger morning digest job via external cron scheduler
  */
 async function triggerDigestJob(req, res, next) {
   const force = req.query.force === 'true';
-  logger.info({ force }, 'Job endpoint /jobs/digest triggered');
+  logger.info({ force }, 'Cron job endpoint /jobs/digest triggered');
 
   try {
     const result = await runMorningDigestJob({ force });
@@ -17,26 +17,26 @@ async function triggerDigestJob(req, res, next) {
       result
     });
   } catch (error) {
-    logger.error({ error }, 'Failed to complete digest job via HTTP trigger');
+    logger.error({ error }, 'Failed to complete digest job via HTTP cron trigger');
     next(error);
   }
 }
 
 /**
- * Trigger periodic email polling job via external scheduler
+ * Trigger periodic 1-hour email polling and digest job via external cron scheduler
  */
 async function triggerPollJob(req, res, next) {
-  logger.info('Job endpoint /jobs/poll-emails triggered');
+  logger.info('Cron job endpoint /jobs/poll-emails triggered');
 
   try {
-    const result = await runEmailPollJob();
+    const result = await runEmailPollJob({ sendHourlySummary: true });
     res.status(200).json({
       status: 'success',
       job: 'poll_emails',
       result
     });
   } catch (error) {
-    logger.error({ error }, 'Failed to complete email poll job via HTTP trigger');
+    logger.error({ error }, 'Failed to complete email poll job via HTTP cron trigger');
     next(error);
   }
 }

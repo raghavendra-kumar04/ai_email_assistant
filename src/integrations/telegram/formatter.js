@@ -148,9 +148,66 @@ You don't need strict commands! Just type naturally:
 `;
 }
 
+/**
+ * Format Hourly Digest for newly arrived emails
+ */
+function formatHourlyDigest(emails = []) {
+  if (!emails || emails.length === 0) {
+    return '';
+  }
+
+  const timeStr = formatTimeIST(new Date());
+  const important = emails.filter((e) => e.category === 'important');
+  const actionRequired = emails.filter((e) => e.requiresAction || e.category === 'action_required');
+  const informational = emails.filter((e) => e.category === 'informational' && !e.requiresAction);
+
+  let message = `📬 *Hourly Email Digest* (${emails.length} new) — ${timeStr} IST\n\n`;
+
+  if (important.length > 0) {
+    message += `🔴 *Important Updates:*\n`;
+    for (const email of important) {
+      message += `• *${email.sender}*: ${email.subject}\n`;
+      if (email.summary) message += `  _${email.summary}_\n`;
+      if (email.deadline) message += `  ⏰ *Deadline:* ${email.deadline}\n`;
+    }
+    message += `\n`;
+  }
+
+  if (actionRequired.length > 0) {
+    message += `🟡 *Action Needed:*\n`;
+    for (const email of actionRequired) {
+      message += `• *${email.sender}*: ${email.subject}\n`;
+      if (email.actionDescription || email.summary) {
+        message += `  👉 ${email.actionDescription || email.summary}\n`;
+      }
+      if (email.deadline) message += `  ⏰ *Due:* ${email.deadline}\n`;
+    }
+    message += `\n`;
+  }
+
+  if (informational.length > 0) {
+    message += `🟢 *Informational Updates:*\n`;
+    for (const email of informational.slice(0, 5)) {
+      message += `• *${email.sender}*: ${email.subject}\n`;
+      if (email.summary) message += `  _${email.summary}_\n`;
+    }
+    if (informational.length > 5) {
+      message += `  _...and ${informational.length - 5} more notifications_\n`;
+    }
+    message += `\n`;
+  }
+
+  message += `━━━━━━━━━━━━━━━━━━━━━\n`;
+  message += `💬 _Ask me anytime for details on any of these!_`;
+
+  return message;
+}
+
 module.exports = {
   formatMorningDigest,
+  formatHourlyDigest,
   formatImportantAlert,
   formatStartMessage,
   formatHelpMessage
 };
+

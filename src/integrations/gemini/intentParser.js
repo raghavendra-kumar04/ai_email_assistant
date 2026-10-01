@@ -58,7 +58,11 @@ Return ONLY the JSON object.
       contents: [{ role: 'user', parts: [{ text: prompt }] }],
       generationConfig: {
         responseMimeType: 'application/json',
-        temperature: 0.1
+        temperature: 0.1,
+        maxOutputTokens: 1024,
+        thinkingConfig: {
+          thinkingBudget: 0
+        }
       }
     });
 

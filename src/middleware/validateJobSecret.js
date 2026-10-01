@@ -1,24 +1,20 @@
 const logger = require('../utils/logger');
 
 /**
- * Middleware to authenticate requests to scheduled job endpoints
- * Enforces X-Job-Secret header or ?secret= query parameter
+ * Middleware to secure job execution endpoints with X-Job-Secret header
  */
 function validateJobSecret(req, res, next) {
-  const secretFromHeader = req.headers['x-job-secret'];
-  const secretFromQuery = req.query.secret;
-  const expectedSecret = process.env.JOB_SECRET;
+  const secretHeader = req.headers['x-job-secret'];
+  const configuredSecret = process.env.JOB_SECRET;
 
-  if (!expectedSecret) {
-    logger.error('❌ JOB_SECRET is not configured in environment variables');
+  if (!configuredSecret) {
+    logger.error('JOB_SECRET is not configured in environment variables');
     return res.status(500).json({ error: 'Server misconfiguration: JOB_SECRET missing' });
   }
 
-  const providedSecret = secretFromHeader || secretFromQuery;
-
-  if (!providedSecret || providedSecret !== expectedSecret) {
-    logger.warn(`🚫 Unauthorized attempt to trigger job at ${req.originalUrl}`);
-    return res.status(403).json({ error: 'Unauthorized: Invalid or missing job secret' });
+  if (!secretHeader || secretHeader !== configuredSecret) {
+    logger.warn({ ip: req.ip, path: req.originalUrl }, '🚫 Unauthorized attempt to trigger job endpoint');
+    return res.status(403).json({ error: 'Forbidden: Invalid or missing X-Job-Secret' });
   }
 
   next();

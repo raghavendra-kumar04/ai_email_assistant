@@ -4,6 +4,7 @@ const app = require('./app');
 const { validateEnv } = require('./config/env');
 const { connectDB } = require('./config/database');
 const { startDevPolling } = require('./integrations/telegram/polling');
+const { startInternalScheduler, stopInternalScheduler } = require('./jobs/scheduler');
 const logger = require('./utils/logger');
 
 // 1. Validate environment configuration
@@ -21,6 +22,9 @@ async function startServer() {
       logger.info(`📍 Health check: http://localhost:${PORT}/health`);
       logger.info(`🔑 Google OAuth: http://localhost:${PORT}/auth/google`);
 
+      // Start internal 1-hour email poller & morning digest timer
+      startInternalScheduler();
+
       // In local development, enable long-polling so bot receives Telegram messages without ngrok/webhooks
       if (envConfig.NODE_ENV !== 'production') {
         startDevPolling();
@@ -30,6 +34,7 @@ async function startServer() {
     // Graceful shutdown listeners
     const handleShutdown = async (signal) => {
       logger.info(`Received ${signal}. Shutting down gracefully...`);
+      stopInternalScheduler();
       server.close(() => {
         logger.info('HTTP server closed.');
         process.exit(0);

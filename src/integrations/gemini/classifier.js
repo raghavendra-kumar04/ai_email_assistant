@@ -49,7 +49,11 @@ CATEGORY DEFINITIONS:
           contents: [{ role: 'user', parts: [{ text: prompt }] }],
           generationConfig: {
             responseMimeType: 'application/json',
-            temperature: 0.1
+            temperature: 0.1,
+            maxOutputTokens: 1024,
+            thinkingConfig: {
+              thinkingBudget: 0
+            }
           }
         }),
       { context: `Classify email: "${emailData.subject}"` }

@@ -12,7 +12,7 @@ router.use(validateJobSecret);
 // Morning digest trigger (scheduled for ~7:30 AM IST)
 router.get('/digest', triggerDigestJob);
 
-// Periodic email polling trigger (scheduled hourly)
+// 1-hour periodic email polling & hourly digest trigger (wakes server)
 router.get('/poll-emails', triggerPollJob);
 
 module.exports = router;

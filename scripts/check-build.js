@@ -54,7 +54,7 @@ async function runChecks() {
     true
   );
 
-  // 2. Utility Functions Check
+  // 2. Utility Engine Checks
   console.log('\n2. Utility Engine Checks:');
   assert('HTML sanitization works', stripHtml('<b>Test</b>') === 'Test');
   assert('Sender cleaner works', cleanSender('John Doe <john@example.com>').email === 'john@example.com');
