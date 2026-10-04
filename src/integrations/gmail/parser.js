@@ -1,8 +1,25 @@
 const { cleanSender, stripHtml, truncateText } = require('../../utils/textHelpers');
 
+function extractAttachmentFilenames(payload) {
+  const filenames = [];
+  function traverse(part) {
+    if (!part) return;
+    if (part.filename && part.filename.trim().length > 0) {
+      filenames.push(part.filename.trim());
+    }
+    if (part.parts && Array.isArray(part.parts)) {
+      for (const subPart of part.parts) {
+        traverse(subPart);
+      }
+    }
+  }
+  traverse(payload);
+  return filenames;
+}
+
 /**
  * Parse a raw Gmail API message response into a structured email object
- * Note: Keeps data minimal (subject + snippet only) per architectural privacy requirements
+ * Note: Keeps data minimal (subject + snippet + attachment names only) per privacy requirements
  */
 function parseGmailMessage(rawMessage) {
   if (!rawMessage || !rawMessage.payload) {
@@ -38,6 +55,7 @@ function parseGmailMessage(rawMessage) {
 
   // Clean snippet: truncate and strip any stray HTML entities
   const cleanSnippetText = truncateText(stripHtml(snippet || ''), 250);
+  const attachments = extractAttachmentFilenames(rawMessage.payload);
 
   return {
     gmailMessageId: id,
@@ -46,6 +64,7 @@ function parseGmailMessage(rawMessage) {
     senderEmail,
     subject: subject.trim(),
     snippet: cleanSnippetText,
+    attachments,
     receivedAt
   };
 }

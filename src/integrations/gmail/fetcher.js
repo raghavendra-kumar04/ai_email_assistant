@@ -83,46 +83,57 @@ async function searchEmails(query, maxResults = 25) {
     return [];
   }
 
-  // Fetch metadata for each message concurrently with a limit
-  const fetchPromises = messages.slice(0, 10).map((m) => fetchEmailById(m.id));
+  // Fetch metadata for each message concurrently with a limit up to maxResults
+  const fetchPromises = messages.slice(0, maxResults).map((m) => fetchEmailById(m.id));
   const results = await Promise.all(fetchPromises);
 
   return results.filter(Boolean);
 }
 
 /**
- * Fetch changes since lastHistoryId using history.list
+ * Fetch changes since startHistoryId using history.list with pagination
  */
 async function fetchHistoryChanges(startHistoryId) {
   const gmail = getGmailClient();
 
   try {
-    const res = await withRetry(
-      () =>
-        gmail.users.history.list({
-          userId: 'me',
-          startHistoryId,
-          historyTypes: ['messageAdded']
-        }),
-      { context: 'Gmail history list' }
-    );
-
-    const historyItems = res.data.history || [];
     const newMessageIds = new Set();
+    let pageToken = null;
+    let latestHistoryId = startHistoryId;
 
-    for (const item of historyItems) {
-      if (item.messagesAdded) {
-        for (const added of item.messagesAdded) {
-          if (added.message && added.message.id) {
-            newMessageIds.add(added.message.id);
+    do {
+      const res = await withRetry(
+        () =>
+          gmail.users.history.list({
+            userId: 'me',
+            startHistoryId,
+            pageToken: pageToken || undefined,
+            historyTypes: ['messageAdded']
+          }),
+        { context: 'Gmail history list' }
+      );
+
+      const historyItems = res.data.history || [];
+      if (res.data.historyId) {
+        latestHistoryId = res.data.historyId;
+      }
+
+      for (const item of historyItems) {
+        if (item.messagesAdded) {
+          for (const added of item.messagesAdded) {
+            if (added.message && added.message.id) {
+              newMessageIds.add(added.message.id);
+            }
           }
         }
       }
-    }
+
+      pageToken = res.data.nextPageToken;
+    } while (pageToken);
 
     return {
       messageIds: Array.from(newMessageIds),
-      latestHistoryId: res.data.historyId || startHistoryId
+      latestHistoryId
     };
   } catch (error) {
     // If startHistoryId is too old or invalid (Gmail error 404), signal caller to reset

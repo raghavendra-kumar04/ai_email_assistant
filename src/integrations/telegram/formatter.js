@@ -138,6 +138,8 @@ You don't need strict commands! Just type naturally:
 • \`/sync\` — Pulls and classifies the latest emails from your Gmail inbox
 • \`/today\` — Shows all emails received today
 • \`/important\` — Lists all important emails from the last 7 days
+• \`/actions\` — Lists pending emails that require your action
+• \`/done <keyword>\` — Mark an action item as completed
 • \`/summary\` — Quick statistical & thematic summary of recent emails
 • \`/help\` — Shows this message
 

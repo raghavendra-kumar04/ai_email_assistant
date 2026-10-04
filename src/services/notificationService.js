@@ -15,8 +15,9 @@ async function notifyIfImportant(emailDoc) {
     return;
   }
 
-  // Only notify if category is 'important'
-  if (emailDoc.category !== 'important') {
+  // Only notify if category is 'important' or urgent action required (high priority)
+  const isUrgent = emailDoc.category === 'important' || (emailDoc.requiresAction && emailDoc.priority === 'high');
+  if (!isUrgent) {
     return;
   }
 

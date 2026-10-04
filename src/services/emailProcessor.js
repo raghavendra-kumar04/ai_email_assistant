@@ -57,8 +57,9 @@ async function processEmail(messageId, options = {}) {
     'Email processed & classified'
   );
 
-  // 5. Send immediate notification if important
-  if (shouldNotify && classification.category === 'important') {
+  // 5. Send immediate notification if important or high-priority action required
+  const isUrgent = classification.category === 'important' || (classification.requiresAction && classification.priority === 'high');
+  if (shouldNotify && isUrgent) {
     await notifyIfImportant(emailDoc);
   }
 

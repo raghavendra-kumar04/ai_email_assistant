@@ -152,7 +152,58 @@ async function handleCommand(command, chatId) {
       break;
     }
 
+    case '/actions': {
+      const actionEmails = await Email.find({ requiresAction: true })
+        .sort({ receivedAt: -1 })
+        .limit(10);
+
+      if (actionEmails.length === 0) {
+        await sendMessage('✨ No pending action items! You are completely caught up.', { chatId });
+        break;
+      }
+
+      let text = `🟡 *Pending Action Items*\n\n`;
+      actionEmails.forEach((e, idx) => {
+        text += `${idx + 1}. *${e.sender}*: ${e.subject}\n`;
+        if (e.actionDescription) text += `   👉 _${e.actionDescription}_\n`;
+        if (e.deadline) text += `   ⏰ *Due:* ${e.deadline}\n`;
+        text += `\n`;
+      });
+      text += `💡 _To mark an item done: \`/done <sender or keyword>\`_`;
+
+      await sendMessage(text, { chatId });
+      break;
+    }
+
     default: {
+      if (cmd.startsWith('/done')) {
+        const query = cmd.replace(/^\/done\s*/, '').trim();
+        if (!query) {
+          await sendMessage('ℹ️ Please specify which action item to mark done (e.g. `/done Amazon` or `/done electricity bill`).', { chatId });
+          break;
+        }
+
+        const matched = await Email.findOneAndUpdate(
+          {
+            requiresAction: true,
+            $or: [
+              { subject: new RegExp(query, 'i') },
+              { sender: new RegExp(query, 'i') },
+              { actionDescription: new RegExp(query, 'i') }
+            ]
+          },
+          { $set: { requiresAction: false } },
+          { new: true }
+        );
+
+        if (matched) {
+          await sendMessage(`✅ Marked action item as completed:\n*${matched.sender}* — ${matched.subject}`, { chatId });
+        } else {
+          await sendMessage(`❓ Could not find a pending action item matching "${query}". Type \`/actions\` to see current pending items.`, { chatId });
+        }
+        break;
+      }
+
       await sendMessage(
         `❓ Unknown command. Type /help to see all available commands or just ask a question naturally!`,
         { chatId }

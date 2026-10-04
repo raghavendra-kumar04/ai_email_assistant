@@ -12,6 +12,38 @@ async function sendMessage(text, options = {}) {
     return;
   }
 
+  if (!text || typeof text !== 'string') {
+    return;
+  }
+
+  // Handle messages longer than Telegram's 4096 character limit by chunking
+  const MAX_CHUNK_LENGTH = 4000;
+  if (text.length > MAX_CHUNK_LENGTH) {
+    const chunks = [];
+    let remaining = text;
+    while (remaining.length > 0) {
+      if (remaining.length <= MAX_CHUNK_LENGTH) {
+        chunks.push(remaining);
+        break;
+      }
+      let splitIdx = remaining.lastIndexOf('\n\n', MAX_CHUNK_LENGTH);
+      if (splitIdx === -1 || splitIdx < 1000) {
+        splitIdx = remaining.lastIndexOf('\n', MAX_CHUNK_LENGTH);
+      }
+      if (splitIdx === -1 || splitIdx < 1000) {
+        splitIdx = MAX_CHUNK_LENGTH;
+      }
+      chunks.push(remaining.substring(0, splitIdx));
+      remaining = remaining.substring(splitIdx).trimStart();
+    }
+
+    let lastRes;
+    for (const chunk of chunks) {
+      lastRes = await sendMessage(chunk, options);
+    }
+    return lastRes;
+  }
+
   const payload = {
     chat_id: chatId,
     text,
