@@ -34,7 +34,12 @@ async function fetchEmailById(messageId) {
 
     return parseGmailMessage(res.data);
   } catch (err) {
-    logger.error({ err, messageId }, 'Failed to fetch email by ID');
+    const status = err.status || err.response?.status || err.code;
+    if (status === 404) {
+      logger.warn({ messageId }, 'Email not found in Gmail (likely deleted/trashed). Skipping.');
+    } else {
+      logger.error({ err, messageId }, 'Failed to fetch email by ID');
+    }
     return null;
   }
 }
