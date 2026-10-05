@@ -65,7 +65,7 @@ flowchart TD
     end
 
     subgraph Telegram Bot Interface
-        F -->|With Inline Buttons [Open] [Done] [Reply]| I["Telegram Bot (Owner Chat ID)"]
+        F -->|With Interactive Buttons: Open, Done, Reply| I["Telegram Bot (Owner Chat ID)"]
         H -->|Morning 7:30 AM & Sunday 8:00 PM| I
         I -->|User Chat Queries & Slash Commands| J["Groq LPU (Llama 3.3 70B) Intent Parser"]
         J -->|Search MongoDB + Live Gmail Fallback| K["Gemini Summarizer"]
