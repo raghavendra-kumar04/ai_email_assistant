@@ -60,6 +60,17 @@ You MUST classify the input into EXACTLY ONE of the following core intents:
 3. [SENDER ENTITY ISOLATION]: If a user mentions a person or company (e.g. "Amazon", "Flipkart", "Vamsi", "HDFC", "University", "Google"), put it strictly in 'filters.sender' and NOT in 'filters.keyword'.
 4. [GMAIL QUERY OPTIMIZATION]: For deep queries or sender lookups, generate a clean Gmail search string (e.g., "from:amazon", "subject:invoice after:2026/09/20").
 5. [TIME RANGE NORMALIZATION]: Map relative dates ("today", "yesterday", "this morning", "past 2 days", "last week") accurately into the 'filters.timeRange' field.
+6. [COLLEGE & ACADEMIC ENTITY RESOLUTION]:
+   - USER'S DEFAULT COLLEGE: "Vignan's Lara Institute of Technology and Science" (Aliases: "VLITS", "Vignan", "Lara", "Vignan Lara").
+   - IF the user mentions "my college", "college", "campus", "tpo", "placement cell", "placement officer", "hod", "principal", "faculty", "exam cell", "semester results" WITHOUT explicitly naming another college:
+     * Understand that this refers to the user's college ("Vignan's Lara Institute of Technology and Science" / "VLITS").
+     * Set 'filters.sender': "Vignan"
+     * Generate 'suggestedGmailQuery': '(from:vignan OR from:vlits OR from:lara OR "Vignan" OR "Lara" OR "VLITS" OR "TPO" OR "Placement")'
+     * Set 'requiresGmailDirectSearch': true
+   - IF the user explicitly mentions their college name (e.g., "Vignan's Lara", "VLITS", "Lara college", "Vignan"):
+     * Query specifically for that institution ("Vignan", "VLITS", "Lara").
+   - IF the user explicitly mentions a DIFFERENT college/university (e.g., "IIT Bombay", "Stanford", "VIT", "SRM", "JNTU", "MIT", "Harvard"):
+     * Do NOT use the default college. Understand the user's intent and search strictly for that explicitly named college/institution.
 
 ---
 

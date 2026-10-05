@@ -58,10 +58,20 @@ function formatTimeIST(date) {
   });
 }
 
+/**
+ * Check if current IST time falls within Night DND Window (11:00 PM to 7:00 AM IST)
+ */
+function isDndActive() {
+  const ist = getNowIST();
+  const hours = ist.getHours();
+  return hours >= 23 || hours < 7;
+}
+
 module.exports = {
   getNowIST,
   getTodayISTDateString,
   getFormattedISTDate,
   getStartOfDayUTC,
-  formatTimeIST
+  formatTimeIST,
+  isDndActive
 };

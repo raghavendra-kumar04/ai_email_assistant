@@ -3,6 +3,7 @@ require('dotenv').config();
 const app = require('./app');
 const { validateEnv } = require('./config/env');
 const { connectDB } = require('./config/database');
+const { registerBotCommands } = require('./integrations/telegram/client');
 const { startDevPolling } = require('./integrations/telegram/polling');
 const { startInternalScheduler, stopInternalScheduler } = require('./jobs/scheduler');
 const logger = require('./utils/logger');
@@ -16,6 +17,9 @@ const PORT = envConfig.PORT || 3000;
 async function startServer() {
   try {
     await connectDB();
+
+    // Register Telegram slash command menu
+    await registerBotCommands();
 
     const server = app.listen(PORT, () => {
       logger.info(`🚀 AI Email Assistant server running on port ${PORT} [${envConfig.NODE_ENV}]`);

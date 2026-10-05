@@ -140,7 +140,10 @@ You don't need strict commands! Just type naturally:
 • \`/important\` — Lists all important emails from the last 7 days
 • \`/actions\` — Lists pending emails that require your action
 • \`/done <keyword>\` — Mark an action item as completed
-• \`/summary\` — Quick statistical & thematic summary of recent emails
+• \`/reply <keyword>\` — Generate 3 AI reply draft options
+• \`/placements\` — Campus & TPO recruitment drive tracker
+• \`/weekly\` — Comprehensive 7-day retrospective & upcoming deadlines
+• \`/summary\` — Quick statistical & category breakdown
 • \`/help\` — Shows this message
 
 🔒 *Privacy & Retention:*
@@ -148,6 +151,102 @@ You don't need strict commands! Just type naturally:
 • Your original Gmail emails are *never* deleted or altered.
 • AI only analyzes metadata & snippets for privacy.
 `;
+}
+
+/**
+ * Format Telegram Inline Keyboard with direct action buttons
+ */
+function formatActionKeyboard(email) {
+  if (!email) return undefined;
+  const keyboard = [];
+  const row1 = [];
+
+  if (email.gmailMessageId) {
+    row1.push({
+      text: '🔗 Open in Gmail',
+      url: `https://mail.google.com/mail/u/0/#inbox/${email.gmailMessageId}`
+    });
+  }
+
+  if (email.requiresAction && email._id) {
+    row1.push({
+      text: '✅ Mark Done',
+      callback_data: `done:${email._id}`
+    });
+  }
+
+  if (row1.length > 0) keyboard.push(row1);
+
+  if (email._id) {
+    keyboard.push([
+      {
+        text: '✍️ Draft Quick Reply',
+        callback_data: `reply:${email._id}`
+      }
+    ]);
+  }
+
+  return keyboard.length > 0 ? { inline_keyboard: keyboard } : undefined;
+}
+
+/**
+ * Format Campus & Placement Drive updates
+ */
+function formatPlacementUpdates(emails = []) {
+  if (!emails || emails.length === 0) {
+    return '🎓 *Campus & Placement Tracker*\n\n✨ No recent placement or internship emails detected in the last 7 days.';
+  }
+
+  let message = `🎓 *Campus & Placement Drive Tracker* (${emails.length} active)\n`;
+  message += `━━━━━━━━━━━━━━━━━━━━━\n\n`;
+
+  emails.forEach((e, idx) => {
+    message += `${idx + 1}. *${e.sender}*: ${e.subject}\n`;
+    if (e.summary) message += `   📝 _${e.summary}_\n`;
+    if (e.actionDescription) message += `   👉 *Action:* ${e.actionDescription}\n`;
+    if (e.deadline) message += `   ⏰ *Deadline:* ${e.deadline}\n`;
+    message += `\n`;
+  });
+
+  message += `💡 _Tip: Tap any email or ask "Summarize placement updates" for details!_`;
+  return message;
+}
+
+/**
+ * Format Weekly Retrospective & Executive Digest
+ */
+function formatWeeklyDigest(data) {
+  let message = `📊 *Weekly Executive Email Digest*\n`;
+  message += `━━━━━━━━━━━━━━━━━━━━━\n\n`;
+
+  message += `📈 *7-Day Volume Overview*\n`;
+  message += `• Total Emails Processed: *${data.totalCount || 0}*\n`;
+  message += `• 🔴 Important Flagged: *${data.importantCount || 0}*\n`;
+  message += `• 🟡 Action Items Created: *${data.actionRequiredCount || 0}*\n`;
+  message += `• ✅ Action Items Resolved: *${data.resolvedActionsCount || 0}*\n\n`;
+
+  if (data.pendingActions && data.pendingActions.length > 0) {
+    message += `⏳ *Pending Action Items (${data.pendingActions.length})*\n`;
+    data.pendingActions.slice(0, 5).forEach((item, idx) => {
+      message += `${idx + 1}. *${item.sender}*: ${item.subject}\n`;
+      if (item.deadline) message += `   ⏰ Due: ${item.deadline}\n`;
+    });
+    message += `\n`;
+  } else {
+    message += `🎉 *All action items are resolved for the week!*\n\n`;
+  }
+
+  if (data.upcomingDeadlines && data.upcomingDeadlines.length > 0) {
+    message += `⏰ *Upcoming Deadlines Ahead*\n`;
+    data.upcomingDeadlines.forEach((item) => {
+      message += `• *${item.deadline}* — ${item.subject} (_${item.sender}_)\n`;
+    });
+    message += `\n`;
+  }
+
+  message += `━━━━━━━━━━━━━━━━━━━━━\n`;
+  message += `💡 _Have a productive week ahead! Ask me anytime about your emails._`;
+  return message;
 }
 
 /**
@@ -209,6 +308,9 @@ module.exports = {
   formatMorningDigest,
   formatHourlyDigest,
   formatImportantAlert,
+  formatActionKeyboard,
+  formatPlacementUpdates,
+  formatWeeklyDigest,
   formatStartMessage,
   formatHelpMessage
 };

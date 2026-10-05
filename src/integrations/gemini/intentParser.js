@@ -22,6 +22,14 @@ CRITICAL RULES:
 1. NEVER put greetings ("hi", "hello", "hey") or status words ("status", "work", "progress") into 'filters.keyword'!
 2. For "casual_greeting", set fetchUnseenRecent: true.
 3. For "status_inquiry", set fetchUnseenRecent: true and wantsBotStatus: true.
+4. [COLLEGE & ACADEMIC ENTITY RESOLUTION]:
+   - USER'S DEFAULT COLLEGE: "Vignan's Lara Institute of Technology and Science" (Aliases: "VLITS", "Vignan", "Lara").
+   - IF the user mentions "my college", "college", "campus", "tpo", "placement cell", "placement officer", "hod", "principal", "faculty", "exam cell" WITHOUT explicitly naming another college:
+     * Set 'filters.sender': "Vignan"
+     * Generate 'suggestedGmailQuery': '(from:vignan OR from:vlits OR from:lara OR "Vignan" OR "Lara" OR "VLITS" OR "TPO" OR "Placement")'
+     * Set 'requiresGmailDirectSearch': true
+   - IF the user explicitly mentions another college (e.g. "IIT Bombay", "Stanford", "VIT", "SRM", "JNTU"):
+     * Understand the intent and search strictly for that explicitly named college.
 
 Output MUST be valid JSON with this schema:
 {

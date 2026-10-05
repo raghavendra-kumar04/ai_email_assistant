@@ -2,6 +2,8 @@ const axios = require('axios');
 const logger = require('../../utils/logger');
 const { handleCommand } = require('../../controllers/commandHandler');
 const { handleNaturalLanguageQuery } = require('../../controllers/intentHandler');
+const { handleCallbackQuery } = require('../../controllers/callbackHandler');
+const { registerBotCommands } = require('./client');
 
 let isPolling = false;
 let offset = 0;
@@ -20,7 +22,10 @@ async function startDevPolling() {
   isPolling = true;
   logger.info('🤖 Starting Telegram local dev polling worker...');
 
-  // Delete any lingering webhook to allow getUpdates
+  // 1. Register slash commands menu with Telegram
+  await registerBotCommands();
+
+  // 2. Delete any lingering webhook to allow getUpdates
   try {
     await axios.post(`https://api.telegram.org/bot${token}/deleteWebhook`, {
       drop_pending_updates: false
@@ -50,6 +55,16 @@ async function pollLoop() {
 
       for (const update of updates) {
         offset = update.update_id + 1;
+
+        // Handle Inline Keyboard button clicks (callback_query)
+        if (update.callback_query) {
+          try {
+            await handleCallbackQuery(update.callback_query);
+          } catch (cbErr) {
+            logger.error({ cbErr }, 'Error processing Telegram callback query in dev poller');
+          }
+          continue;
+        }
 
         const message = update.message || update.edited_message;
         if (!message || !message.text) continue;

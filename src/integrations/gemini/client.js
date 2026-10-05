@@ -4,12 +4,13 @@ const { sleep } = require('../../utils/retry');
 
 let genAI = null;
 
-const DEFAULT_MODEL = 'gemini-3.7-flash';
+const DEFAULT_MODEL = 'gemini-2.5-flash';
 const FALLBACK_MODELS = [
-  'gemini-3.7-flash',
-  'gemini-3.8-flash',
-  'gemini-flash-latest',
-  'gemini-3.5-flash'
+  'gemini-2.5-flash',
+  'gemini-2.0-flash',
+  'gemini-1.5-flash',
+  'gemini-1.5-flash-8b',
+  'gemini-1.5-pro'
 ];
 
 function getGeminiClient() {

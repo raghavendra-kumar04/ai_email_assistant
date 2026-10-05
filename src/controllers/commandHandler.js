@@ -2,11 +2,17 @@ const Email = require('../models/Email');
 const {
   formatStartMessage,
   formatHelpMessage,
-  formatMorningDigest
+  formatMorningDigest,
+  formatPlacementUpdates,
+  formatWeeklyDigest,
+  formatActionKeyboard
 } = require('../integrations/telegram/formatter');
 const { sendMessage, sendChatAction } = require('../integrations/telegram/sender');
 const { searchEmails } = require('../integrations/gmail/fetcher');
 const { processEmailBatch } = require('../services/emailProcessor');
+const { getPlacementUpdates } = require('../services/placementService');
+const { getWeeklyDigestData } = require('../services/weeklyService');
+const { generateReplyDrafts } = require('../services/replyService');
 const { getStartOfDayUTC, getTodayISTDateString } = require('../utils/dateHelpers');
 const logger = require('../utils/logger');
 
@@ -121,10 +127,23 @@ async function handleCommand(command, chatId) {
       break;
     }
 
+    case '/placements': {
+      const placementEmails = await getPlacementUpdates();
+      const formatted = formatPlacementUpdates(placementEmails);
+      await sendMessage(formatted, { chatId });
+      break;
+    }
+
+    case '/weekly': {
+      const weeklyData = await getWeeklyDigestData();
+      const formatted = formatWeeklyDigest(weeklyData);
+      await sendMessage(formatted, { chatId });
+      break;
+    }
+
     case '/summary': {
       let count = await Email.countDocuments();
 
-      // If MongoDB is brand new with 0 records, automatically fetch and ingest recent 7 days of emails
       if (count === 0) {
         await sendMessage('📥 Ingesting and analyzing your recent emails from Gmail...', { chatId });
         await sendChatAction(chatId, 'typing');
@@ -146,7 +165,7 @@ async function handleCommand(command, chatId) {
       text += `• 🔴 Important Flagged: *${important}*\n`;
       text += `• 🟡 Action Required: *${actions}*\n`;
       text += `• 🟢 Informational: *${informational}*\n\n`;
-      text += `💡 _Tip: You can ask specific questions anytime, e.g. "Did college send any notifications today?" or run \`/sync\` to refresh._`;
+      text += `💡 _Tip: Try \`/placements\` for campus updates or \`/weekly\` for a 7-day review._`;
 
       await sendMessage(text, { chatId });
       break;
@@ -176,6 +195,44 @@ async function handleCommand(command, chatId) {
     }
 
     default: {
+      // Handle /reply <query>
+      if (cmd.startsWith('/reply')) {
+        const query = cmd.replace(/^\/reply\s*/, '').trim();
+        if (!query) {
+          await sendMessage('ℹ️ Please specify which email to draft a reply for (e.g. `/reply Amazon` or `/reply Placement`).', { chatId });
+          break;
+        }
+
+        const emailDoc = await Email.findOne({
+          $or: [
+            { subject: new RegExp(query, 'i') },
+            { sender: new RegExp(query, 'i') },
+            { summary: new RegExp(query, 'i') }
+          ]
+        }).sort({ receivedAt: -1 });
+
+        if (!emailDoc) {
+          await sendMessage(`❓ Could not find a recent email matching "${query}".`, { chatId });
+          break;
+        }
+
+        await sendChatAction(chatId, 'typing');
+        await sendMessage(`✍️ *Drafting reply suggestions for:* "${emailDoc.subject}" (${emailDoc.sender})...`, { chatId });
+
+        const drafts = await generateReplyDrafts(emailDoc);
+        let replyMessage = `📬 *AI Reply Suggestions for:* _${emailDoc.subject}_\n*To:* ${emailDoc.sender}\n\n`;
+
+        drafts.forEach((draft, idx) => {
+          replyMessage += `━━━━━━━━━━━━━━━━━━━━━\n`;
+          replyMessage += `*${draft.label || `Option ${idx + 1}`}*\n\`\`\`text\n${draft.text}\n\`\`\`\n\n`;
+        });
+
+        replyMessage += `💡 _Tap any block to copy, then paste directly into Gmail!_`;
+        await sendMessage(replyMessage, { chatId });
+        break;
+      }
+
+      // Handle /done <query>
       if (cmd.startsWith('/done')) {
         const query = cmd.replace(/^\/done\s*/, '').trim();
         if (!query) {

@@ -1,5 +1,6 @@
 const { handleCommand } = require('./commandHandler');
 const { handleNaturalLanguageQuery } = require('./intentHandler');
+const { handleCallbackQuery } = require('./callbackHandler');
 const logger = require('../utils/logger');
 
 /**
@@ -11,7 +12,19 @@ async function handleTelegramWebhook(req, res) {
   // 1. Immediately return 200 OK to Telegram so it doesn't timeout / retry
   res.status(200).json({ ok: true });
 
-  // 2. Extract message details
+  // 2. Handle Inline Keyboard button clicks (callback_query)
+  if (update.callback_query) {
+    setImmediate(async () => {
+      try {
+        await handleCallbackQuery(update.callback_query);
+      } catch (cbErr) {
+        logger.error({ cbErr }, 'Error processing Telegram callback query in webhook');
+      }
+    });
+    return;
+  }
+
+  // 3. Extract text message details
   const message = update.message || update.edited_message;
   if (!message || !message.text) {
     logger.debug('Received non-text Telegram update. Ignoring.');
@@ -23,7 +36,7 @@ async function handleTelegramWebhook(req, res) {
 
   logger.info({ text, chatId, user: message.from?.username }, 'Received Telegram message');
 
-  // 3. Dispatch asynchronously
+  // 4. Dispatch asynchronously
   setImmediate(async () => {
     try {
       if (text.startsWith('/')) {
