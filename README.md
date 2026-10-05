@@ -48,29 +48,23 @@ An autonomous personal AI Email Intelligence Assistant that continuously monitor
 
 ```mermaid
 flowchart TD
-    subgraph Google Cloud & Gmail
-        A["Gmail API (OAuth2)"] -->|Incremental sync via history.list| B["Fetcher & Parser"]
-        B -->|Extracts Subject, Sender, Snippet, Attachment Names| C["Sanitizer & Normalizer"]
-    end
-
-    subgraph AI Intelligence Pipeline
-        C --> D["Gemini 2.5 Flash Classifier"]
-        D -->|Structured JSON Output| E{"Category & Priority"}
-        E -->|Important / High Action| F["Immediate Alert Dispatcher"]
-        E -->|Informational / General| G["Hourly & Morning Digest Store"]
-    end
-
-    subgraph MongoDB Atlas
-        F & G --> H[("MongoDB Atlas (M0 Free Tier)<br/>7-Day TTL Auto-Purge")]
-    end
-
-    subgraph Telegram Bot Interface
-        F -->|With Interactive Buttons: Open, Done, Reply| I["Telegram Bot (Owner Chat ID)"]
-        H -->|Morning 7:30 AM & Sunday 8:00 PM| I
-        I -->|User Chat Queries & Slash Commands| J["Groq LPU (Llama 3.3 70B) Intent Parser"]
-        J -->|Search MongoDB + Live Gmail Fallback| K["Gemini Summarizer"]
-        K -->|Conversational Answer| I
-    end
+    A["Gmail API (OAuth 2.0)"] -->|Incremental Sync via history.list| B["Email Fetcher & Metadata Parser"]
+    B -->|Sanitize & Extract Snippet| C["Google Gemini 2.5 Flash Classifier"]
+    
+    C -->|Structured JSON Assessment| D{"Category & Priority"}
+    
+    D -->|Important / High Action| E["Immediate Telegram Alert (with Action Buttons)"]
+    D -->|Informational / General| F["Database Ingestion Queue"]
+    
+    E --> F
+    F --> G[("MongoDB Atlas (M0 Free Tier)<br/>7-Day TTL Auto-Purge")]
+    
+    G -->|Morning 7:30 AM & Sunday 8:00 PM Digests| H["Telegram Bot (Owner Chat ID)"]
+    E -->|Push Alert with [Open] [Done] [Reply]| H
+    
+    H -->|User Questions & Slash Commands| I["Groq LPU (Llama 3.3 70B) Intent Parser"]
+    I -->|MongoDB Query + Live Gmail Search| J["Gemini Conversational Summarizer"]
+    J -->|Natural Answers & 3-Option Reply Drafts| H
 ```
 
 ---
