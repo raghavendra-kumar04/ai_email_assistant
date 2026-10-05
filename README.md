@@ -60,7 +60,7 @@ flowchart TD
     F --> G[("MongoDB Atlas (M0 Free Tier)<br/>7-Day TTL Auto-Purge")]
     
     G -->|Morning 7:30 AM & Sunday 8:00 PM Digests| H["Telegram Bot (Owner Chat ID)"]
-    E -->|Push Alert with [Open] [Done] [Reply]| H
+    E -->|Push Alert with Interactive Buttons| H
     
     H -->|User Questions & Slash Commands| I["Groq LPU (Llama 3.3 70B) Intent Parser"]
     I -->|MongoDB Query + Live Gmail Search| J["Gemini Conversational Summarizer"]
