@@ -41,11 +41,15 @@ Return a valid JSON object matching this exact schema:
   "actionDescription": "Short description of required action or null"
 }
 
-CATEGORY DEFINITIONS:
-- "important": Critical updates, urgent personal/academic/financial/job matters, security alerts, high-priority communications.
+CATEGORY DEFINITIONS & CALIBRATION:
+- "important": Critical updates, urgent personal/academic/financial/job matters, security alerts, high-priority communications directly targeting the recipient.
 - "action_required": Requires recipient to do something (register, reply, pay, submit, verify, attend).
 - "informational": Newsletters, automated order tracking, notifications, general updates that don't need urgent action.
 - "spam": Marketing, promotional blast, unsolicited offers.
+
+DEADLINE & ACTION EXTRACTION RULES:
+- Only set "deadline" (in YYYY-MM-DD format) if an explicit due date is directly stated in the text. If no exact deadline is mentioned, "deadline" MUST be null. Never infer or invent dates.
+- If "requiresAction" is true, "actionDescription" must be a concise, actionable summary (max 100 chars). Otherwise null.
 `;
 
   try {
@@ -56,10 +60,7 @@ CATEGORY DEFINITIONS:
           generationConfig: {
             responseMimeType: 'application/json',
             temperature: 0.1,
-            maxOutputTokens: 1024,
-            thinkingConfig: {
-              thinkingBudget: 0
-            }
+            maxOutputTokens: 1024
           }
         }),
       { context: `Classify email: "${emailData.subject}"` }

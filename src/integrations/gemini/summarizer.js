@@ -45,10 +45,7 @@ INSTRUCTIONS:
       contents: [{ role: 'user', parts: [{ text: prompt }] }],
       generationConfig: {
         temperature: 0.2,
-        maxOutputTokens: 2048,
-        thinkingConfig: {
-          thinkingBudget: 0
-        }
+        maxOutputTokens: 2048
       }
     });
 
@@ -134,10 +131,7 @@ INSTRUCTIONS:
       contents: [{ role: 'user', parts: [{ text: prompt }] }],
       generationConfig: {
         temperature: 0.25,
-        maxOutputTokens: 2048,
-        thinkingConfig: {
-          thinkingBudget: 0
-        }
+        maxOutputTokens: 2048
       }
     });
 

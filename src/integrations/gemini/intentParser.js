@@ -67,10 +67,7 @@ Return ONLY the JSON object.
       generationConfig: {
         responseMimeType: 'application/json',
         temperature: 0.1,
-        maxOutputTokens: 1024,
-        thinkingConfig: {
-          thinkingBudget: 0
-        }
+        maxOutputTokens: 1024
       }
     });
 

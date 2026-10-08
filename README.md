@@ -4,13 +4,13 @@
   <img src="https://img.shields.io/badge/Node.js-v18+-68a063?style=for-the-badge&logo=node.js&logoColor=white" alt="Node.js" />
   <img src="https://img.shields.io/badge/Express.js-4.21-000000?style=for-the-badge&logo=express&logoColor=white" alt="Express" />
   <img src="https://img.shields.io/badge/MongoDB_Atlas-7--Day_TTL-47A248?style=for-the-badge&logo=mongodb&logoColor=white" alt="MongoDB" />
-  <img src="https://img.shields.io/badge/Google_Gemini-2.5_Flash-4285F4?style=for-the-badge&logo=google&logoColor=white" alt="Gemini" />
+  <img src="https://img.shields.io/badge/Google_Gemini-3.5_Flash-4285F4?style=for-the-badge&logo=google&logoColor=white" alt="Gemini" />
   <img src="https://img.shields.io/badge/Groq_LPU-Llama_3.3_70B-F55036?style=for-the-badge&logo=groq&logoColor=white" alt="Groq" />
   <img src="https://img.shields.io/badge/Telegram_Bot-Interactive_UI-26A5E4?style=for-the-badge&logo=telegram&logoColor=white" alt="Telegram" />
   <img src="https://img.shields.io/badge/Cost-%E2%82%B90_Free_Forever-brightgreen?style=for-the-badge" alt="Free Tier" />
 </p>
 
-An autonomous personal AI Email Intelligence Assistant that continuously monitors your Gmail inbox, classifies emails with **Google Gemini 2.5 Flash & Groq LPU (Llama 3.3 70B)**, sends smart **Telegram Digests & Alerts**, tracks **Campus Placement/TPO Notices**, generates **1-Tap AI Reply Drafts**, and answers natural language questions conversationally — **100% within free-tier cloud limits at ₹0/month**.
+An autonomous personal AI Email Intelligence Assistant that continuously monitors your Gmail inbox, classifies emails with **Google Gemini 3.5 Flash & Groq LPU (Llama 3.3 70B)** with automatic fallback to **Gemini 3.5 Flash Lite**, sends smart **Telegram Digests & Alerts**, tracks **Campus Placement/TPO Notices**, generates **1-Tap AI Reply Drafts**, and answers natural language questions conversationally — **100% within free-tier cloud limits at ₹0/month**.
 
 ---
 
@@ -39,7 +39,7 @@ An autonomous personal AI Email Intelligence Assistant that continuously monitor
 * **🎓 Campus & Placement Drive Tracker (`/placements`):** Intelligent entity resolution for **Vignan's Lara Institute of Technology and Science (VLITS / TPO)** notices, internship drives, eligibility criteria, and deadlines.
 * **🌙 Smart Night Mode (DND Window):** Silences non-urgent alerts between **11:00 PM and 7:00 AM IST**, cleanly bundling them into your 7:30 AM Morning Digest.
 * **📊 Weekly Executive Retrospective (`/weekly`):** Retrospective delivered every **Sunday at 8:00 PM IST** analyzing 7-day volume, completed tasks, and upcoming deadlines.
-* **⚡ Sub-Second Intent Routing with Groq LPU:** Natural conversational chat powered by Llama 3.3 70B with automatic fallback to Gemini.
+* **⚡ Sub-Second Intent Routing with Groq LPU:** Natural conversational chat powered by Llama 3.3 70B with automatic fallback to Gemini 2.0/1.5 Flash.
 * **🔒 Privacy-First Zero-Body Storage:** Stores only metadata & snippets in MongoDB with an automatic **7-Day TTL (Time-To-Live)**. Original Gmail emails are never altered or deleted (`gmail.readonly`).
 
 ---
@@ -49,7 +49,7 @@ An autonomous personal AI Email Intelligence Assistant that continuously monitor
 ```mermaid
 flowchart TD
     A["Gmail API (OAuth 2.0)"] -->|Incremental Sync via history.list| B["Email Fetcher & Metadata Parser"]
-    B -->|Sanitize & Extract Snippet| C["Google Gemini 2.5 Flash Classifier"]
+    B -->|Sanitize & Extract Snippet| C["Google Gemini 2.0 Flash Classifier"]
     
     C -->|Structured JSON Assessment| D{"Category & Priority"}
     
