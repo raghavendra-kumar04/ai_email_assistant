@@ -10,7 +10,7 @@
   <img src="https://img.shields.io/badge/Cost-%E2%82%B90_Free_Forever-brightgreen?style=for-the-badge" alt="Free Tier" />
 </p>
 
-An autonomous personal AI Email Intelligence Assistant that continuously monitors your Gmail inbox, classifies emails with **Google Gemini 3.5 Flash & Groq LPU (Llama 3.3 70B)** with automatic fallback to **Gemini 3.5 Flash Lite**, sends smart **Telegram Digests & Alerts**, tracks **Campus Placement/TPO Notices**, generates **1-Tap AI Reply Drafts**, and answers natural language questions conversationally — **100% within free-tier cloud limits at ₹0/month**.
+An autonomous personal AI Email Intelligence Assistant that continuously monitors your Gmail inbox, classifies emails with **Google Gemini 3.5 Flash** and **Groq LPU (Llama 3.3 70B)** (with automatic fallback to **Gemini 3.5 Flash Lite**), sends smart **Telegram Digests & Alerts**, tracks **Campus Placement & Career Opportunities**, generates **1-Tap AI Reply Drafts**, and answers natural language questions conversationally — **100% within free-tier cloud limits at ₹0/month**.
 
 ---
 
@@ -22,25 +22,26 @@ An autonomous personal AI Email Intelligence Assistant that continuously monitor
 - [💰 Zero-Cost Quota Analysis](#-zero-cost-quota-analysis)
 - [📁 Project Structure](#-project-structure)
 - [🚀 Quickstart & Local Setup](#-quickstart--local-setup)
-- [🌐 24/7 Render Cloud Deployment](#-247-render-cloud-deployment)
+- [🛡️ Security Checklist & Vulnerability Mitigations](#️-security-checklist--vulnerability-mitigations)
+- [🌐 24/7 Cloud Deployment](#-247-cloud-deployment)
 - [🔒 Security & Privacy Guarantees](#-security--privacy-guarantees)
 
 ---
 
 ## ✨ Key Superpowers
 
-* **📬 Daily Morning Digest (7:30 AM IST):** A structured, executive summary of all incoming communications, priority categorization, action items, and due dates delivered right to your phone.
-* **🚨 Real-Time Important & Urgent Action Alerts:** Immediate push notifications for critical security alerts, high-priority matters, and urgent action items.
+* **📬 Daily Morning Digest (7:30 AM IST):** A structured, executive summary of all incoming communications, priority categorization, action items, and due dates delivered directly to Telegram.
+* **🚨 Real-Time Urgent Action Alerts:** Immediate push notifications for critical security alerts, high-priority matters, and urgent action items.
 * **🔘 Interactive Inline Action Buttons:** Every Telegram alert includes direct interactive buttons:
   * `[ 🔗 Open in Gmail ]` — Deep-links directly to the exact email thread in Gmail.
   * `[ ✅ Mark Done ]` — Instantly marks pending tasks resolved in MongoDB with 1 tap.
   * `[ ✍️ Draft Quick Reply ]` — Triggers Gemini to draft 3 tailored response options.
 * **✍️ 1-Tap AI Reply Drafter (`/reply`):** Automatically drafts 3 distinct, professional email replies (Acceptance, Request Details, Polite Decline) formatted in monospace tap-to-copy code blocks.
-* **🎓 Campus & Placement Drive Tracker (`/placements`):** Intelligent entity resolution for **Vignan's Lara Institute of Technology and Science (VLITS / TPO)** notices, internship drives, eligibility criteria, and deadlines.
+* **🎓 Campus Placement & Career Tracker (`/placements`):** Intelligent entity resolution for Training & Placement Office (TPO) notices, internship drives, eligibility criteria, and deadlines.
 * **🌙 Smart Night Mode (DND Window):** Silences non-urgent alerts between **11:00 PM and 7:00 AM IST**, cleanly bundling them into your 7:30 AM Morning Digest.
 * **📊 Weekly Executive Retrospective (`/weekly`):** Retrospective delivered every **Sunday at 8:00 PM IST** analyzing 7-day volume, completed tasks, and upcoming deadlines.
-* **⚡ Sub-Second Intent Routing with Groq LPU:** Natural conversational chat powered by Llama 3.3 70B with automatic fallback to Gemini 2.0/1.5 Flash.
-* **🔒 Privacy-First Zero-Body Storage:** Stores only metadata & snippets in MongoDB with an automatic **7-Day TTL (Time-To-Live)**. Original Gmail emails are never altered or deleted (`gmail.readonly`).
+* **⚡ Sub-Second Intent Routing with Groq LPU:** Natural conversational chat powered by Llama 3.3 70B with automatic fallback to Gemini 3.5 Flash.
+* **🔒 Privacy-First Zero-Body Permanent Storage:** Stores only sanitized metadata & snippets in MongoDB with an automatic **7-Day TTL (Time-To-Live)**. Original Gmail emails are never altered or deleted (`gmail.readonly` scope).
 
 ---
 
@@ -48,8 +49,8 @@ An autonomous personal AI Email Intelligence Assistant that continuously monitor
 
 ```mermaid
 flowchart TD
-    A["Gmail API (OAuth 2.0)"] -->|Incremental Sync via history.list| B["Email Fetcher & Metadata Parser"]
-    B -->|Sanitize & Extract Snippet| C["Google Gemini 2.0 Flash Classifier"]
+    A["Gmail API (OAuth 2.0 - Read-Only)"] -->|Incremental Sync via history.list| B["Email Fetcher & Metadata Parser"]
+    B -->|Sanitize & Extract Snippet| C["Google Gemini 3.5 Flash Classifier"]
     
     C -->|Structured JSON Assessment| D{"Category & Priority"}
     
@@ -75,12 +76,12 @@ flowchart TD
 ```text
 🚨 Important Email Alert
 
-👤 From: Training & Placement Officer (VLITS)
-📌 Subject: TCS Digital Campus Recruitment Drive — Registration Link
+👤 From: Training & Placement Officer
+📌 Subject: Campus Recruitment Drive — Registration Link
 🕒 Received: 10:45 AM IST
 
 📝 AI Summary:
-Registration is open for TCS Digital campus drive for final year B.Tech students. Mandatory registration required before deadline.
+Registration is open for the upcoming campus recruitment drive for final year students. Mandatory registration required before the deadline.
 
 ⚡ Action Needed: Fill out the application form
 ⏰ Deadline: 2026-10-10
@@ -91,15 +92,15 @@ Registration is open for TCS Digital campus drive for final year B.Tech students
 
 ### 2. 1-Tap AI Reply Drafter (`/reply`)
 ```text
-📬 AI Reply Suggestions for: "TCS Digital Campus Recruitment Drive"
-To: TPO Vignan
+📬 AI Reply Suggestions for: "Campus Recruitment Drive"
+To: Placement Office
 
 ━━━━━━━━━━━━━━━━━━━━━
 Option 1: Quick Acceptance / Confirmation
 ```text
-Dear TPO Team,
+Dear Placement Team,
 
-Thank you for sharing the details regarding the TCS Digital drive. I have successfully submitted my registration form along with the required documents.
+Thank you for sharing the details regarding the recruitment drive. I have successfully submitted my registration form along with the required documents.
 
 Best regards,
 [Your Name]
@@ -110,7 +111,7 @@ Option 2: Acknowledgement / Request Details
 ```text
 Dear Sir/Madam,
 
-Thank you for the update. Could you please clarify if students with an active backlog are eligible to apply for this drive?
+Thank you for the update. Could you please clarify the eligibility criteria and reporting timeline for this drive?
 
 Best regards,
 [Your Name]
@@ -128,7 +129,7 @@ Best regards,
 | **`/today`** | Today's Overview | Displays a breakdown and count of all emails received today. |
 | **`/important`** | High-Priority Mails | Lists all flagged critical communications from the last 7 days. |
 | **`/actions`** | Pending Action Items | Shows all active emails requiring a reply, submission, or payment. |
-| **`/done <keyword>`** | Resolve Action Item | Marks matching task resolved in MongoDB (e.g. `/done Amazon` or `/done TCS`). |
+| **`/done <keyword>`** | Resolve Action Item | Marks matching task resolved in MongoDB (e.g. `/done Project` or `/done Application`). |
 | **`/reply <keyword>`** | Draft AI Replies | Generates 3 professional response options for any matching email. |
 | **`/placements`** | Campus / TPO Tracker | Aggregates campus recruitment circulars, deadlines, and drive links. |
 | **`/weekly`** | 7-Day Retrospective | Comprehensive review of processed volume, completed items, and upcoming dates. |
@@ -138,11 +139,11 @@ Best regards,
 
 ### 💬 Natural Language Questions You Can Ask
 You don't need strict syntax! Just type naturally:
-* *"Did my college or TPO send any emails today?"*
+* *"Did the placement office send any updates today?"*
 * *"What deadlines do I have approaching this week?"*
 * *"Did I receive an invoice or receipt from Amazon?"*
 * *"Show me emails that require my immediate reply"*
-* *"Summarize all updates from professors today"*
+* *"Summarize all updates from professors or project leads today"*
 
 ---
 
@@ -165,7 +166,7 @@ Designed specifically for **100+ emails/day** with massive headroom on free tier
 ```text
 EmailAutomation/
 ├── scripts/
-│   └── check-build.js               # 22-point automated build & security test suite
+│   └── check-build.js               # Automated build & configuration sanity checks
 ├── src/
 │   ├── config/
 │   │   ├── database.js              # MongoDB Atlas connection lifecycle
@@ -190,7 +191,7 @@ EmailAutomation/
 │   │   │   └── parser.js            # Zero-payload attachment name & metadata parser
 │   │   ├── groq/
 │   │   │   ├── client.js            # Groq LPU SDK client
-│   │   │   └── intentParser.js      # Sub-second Llama 3.3 70B intent parser with College rules
+│   │   │   └── intentParser.js      # Sub-second Llama 3.3 70B intent parser
 │   │   └── telegram/
 │   │       ├── client.js            # Telegram Bot API client & setMyCommands menu
 │   │       ├── formatter.js         # Alert templates, inline keyboards & digest formats
@@ -217,7 +218,7 @@ EmailAutomation/
 │   │   ├── digestService.js         # Morning digest compiler with idempotency
 │   │   ├── emailProcessor.js        # Batch ingestion, classification, and urgent alerts
 │   │   ├── notificationService.js   # Immediate alert dispatcher with DND window check
-│   │   ├── placementService.js      # Campus recruitment & TPO notices aggregator
+│   │   ├── placementService.js      # Campus recruitment & career notices aggregator
 │   │   ├── queryService.js          # Dual-layer query engine (MongoDB + Gmail fallback)
 │   │   ├── replyService.js          # 3-option AI quick reply generator
 │   │   └── weeklyService.js         # 7-day retrospective & deadline compiler
@@ -240,105 +241,155 @@ EmailAutomation/
 
 ### 1. Prerequisites
 - **Node.js (v18+)**
-- **MongoDB Atlas Free Cluster (M0)**
+- **MongoDB Atlas Free Cluster (M0)** (or local MongoDB instance)
 - **Google Cloud Console Project** (with Gmail API enabled)
 - **Gemini API Key** (from [Google AI Studio](https://aistudio.google.com/))
 - **Groq API Key** (from [Groq Console](https://console.groq.com/))
 - **Telegram Bot Token** (from `@BotFather` on Telegram)
 
-### 2. Environment Configuration
+### 2. Generate Cryptographically Secure Secrets
+Before setting up your `.env`, generate high-entropy random secrets:
+
+```bash
+# Generate high-entropy 32-byte hexadecimal strings
+openssl rand -hex 32
+```
+*Use one generated value for `JOB_SECRET` and another for `TELEGRAM_WEBHOOK_SECRET`.*
+
+### 3. Environment Configuration
 Copy `.env.example` to `.env`:
 ```bash
 cp .env.example .env
 ```
 
-Configure your variables:
+Populate the configuration values (never commit `.env` to Git):
 ```env
 PORT=3000
 NODE_ENV=development
 
-# Google OAuth2 Credentials
+# Google OAuth2 Credentials (Google Cloud Console)
 GOOGLE_CLIENT_ID=your_client_id.apps.googleusercontent.com
 GOOGLE_CLIENT_SECRET=your_client_secret
 GOOGLE_REDIRECT_URI=http://localhost:3000/auth/google/callback
 GMAIL_REFRESH_TOKEN=
 
-# AI Engine Keys
+# AI Provider Keys
 GEMINI_API_KEY=your_gemini_api_key
 GROQ_API_KEY=your_groq_api_key
 
 # Telegram Bot
 TELEGRAM_BOT_TOKEN=your_bot_token
 TELEGRAM_CHAT_ID=your_numeric_chat_id
-TELEGRAM_WEBHOOK_SECRET=your_random_secret_token
+TELEGRAM_WEBHOOK_SECRET=your_generated_32_byte_webhook_secret
 
 # MongoDB Atlas
-MONGODB_URI=mongodb+srv://<user>:<password>@cluster0.mongodb.net/ai_email_assistant?retryWrites=true&w=majority
+MONGODB_URI=mongodb+srv://<db_user>:<db_password>@cluster0.mongodb.net/ai_email_assistant?retryWrites=true&w=majority
 
-# Security Secret
-JOB_SECRET=your_random_32_character_job_secret
+# External Cron Security Header
+JOB_SECRET=your_generated_32_byte_job_secret
 ```
 
-### 3. Install & Verify
+### 4. Install & Launch
 ```bash
 # 1. Install dependencies
 npm install
 
-# 2. Run automated test suite
+# 2. Run local sanity checks
 npm run check
 
 # 3. Start local development server (includes Telegram dev polling)
 npm run dev
 ```
 
-### 4. Authorize Gmail (One-Time)
+### 5. Authorize Gmail (One-Time Local Flow)
 1. Open your browser and navigate to `http://localhost:3000/auth/google`.
-2. Sign in with your Gmail account and grant read-only access.
-3. On the confirmation screen, copy the generated `GMAIL_REFRESH_TOKEN`.
-4. Paste it into your `.env` file as `GMAIL_REFRESH_TOKEN=...` and restart the server.
+2. Sign in with your Gmail account and approve read-only permissions (`gmail.readonly`).
+3. Copy the generated `GMAIL_REFRESH_TOKEN` displayed on the local confirmation screen.
+4. Add it to your local `.env` and your production deployment environment variables.
+5. Restart your server. The assistant will now autonomously synchronize and process incoming emails.
 
 ---
 
-## 🌐 24/7 Render Cloud Deployment
+## 🛡️ Security Checklist & Vulnerability Mitigations
 
-### 1. Deploy on Render
-1. Create a **New Web Service** on [Render](https://render.com) connected to your GitHub repository.
-2. Settings:
+| Vulnerability Risk | Threat Scenario | Mitigation in Place |
+| :--- | :--- | :--- |
+| **Exposed OAuth Setup Routes** | Unauthorized users visiting `/auth/google` in production | Run the one-time OAuth consent flow **locally on `localhost`**. In production, keep `GMAIL_REFRESH_TOKEN` in environment variables and restrict or remove public access to `/auth/*` endpoints. |
+| **Shell History Credential Leakage** | Running `curl` commands with tokens in the terminal leaves secrets in shell history files (`.bash_history`) | Use environment variables, secure interactive prompts, or standard configuration scripts rather than typing raw tokens in shell command strings. |
+| **Unauthenticated Webhook Triggers** | Attackers spoofing Telegram updates to inject fake messages | `validateTelegramWebhook` validates the `X-Telegram-Bot-Api-Secret-Token` header and verifies that `message.chat.id` strictly matches the owner's `TELEGRAM_CHAT_ID`. |
+| **Unauthorized Cron Triggering** | Malicious actors exhausting API quotas by repeatedly calling `/jobs/*` | `validateJobSecret` requires an `X-Job-Secret` HTTP header matching your configured `JOB_SECRET`, returning `403 Forbidden` for unauthorized calls. |
+| **Credential & Key Leakage via Logs** | Accidental logging of API keys, bearer tokens, or user passwords | Centralized Pino logger uses built-in redaction paths to mask tokens, passwords, and sensitive headers as `[REDACTED]`. |
+| **Accidental Secret Check-in** | Committing `.env` or temporary credential dumps to GitHub | `.env`, `*.log`, and temporary directories are strictly excluded via `.gitignore`. Verify with `git status` prior to committing. |
+| **Prompt Injection Attacks** | Malicious email content attempting to override AI instructions | Email content is treated as untrusted text, truncated, sanitized, and enclosed in strictly bounded prompt fences requiring structured JSON schema replies. |
+| **Over-Privileged OAuth Scopes** | Compromised tokens gaining write or delete access to mailbox | OAuth scope is strictly limited to `https://www.googleapis.com/auth/gmail.readonly`. The app cannot modify, delete, or send emails. |
+
+---
+
+## 🌐 24/7 Cloud Deployment
+
+### 1. Deploy on Cloud Host (e.g. Render / Railway)
+1. Create a **New Web Service** connected to your repository.
+2. Build & Start Settings:
    * **Runtime:** `Node`
    * **Build Command:** `npm install`
    * **Start Command:** `node src/server.js`
-3. Add all environment variables from your `.env` to the Render Dashboard (Set `GOOGLE_REDIRECT_URI=https://<your-app>.onrender.com/auth/google/callback` and `NODE_ENV=production`).
+3. Add all environment variables from your local `.env` into the host dashboard.
+   * Set `GOOGLE_REDIRECT_URI=https://<your-app>.onrender.com/auth/google/callback`
+   * Set `NODE_ENV=production`
 
-### 2. Register Telegram Webhook
-Run this command in your terminal to link Telegram to your Render URL:
+### 2. Register Telegram Webhook Securely
+To prevent storing bot tokens and secrets in terminal history, use environment variables:
+
+**Linux / macOS:**
 ```bash
-curl -X POST "https://api.telegram.org/bot<TELEGRAM_BOT_TOKEN>/setWebhook" \
-  -d "url=https://<your-app>.onrender.com/webhook/telegram" \
-  -d "secret_token=<TELEGRAM_WEBHOOK_SECRET>"
+read -s -p "Enter Telegram Bot Token: " BOT_TOKEN && echo
+read -s -p "Enter Webhook Secret: " WEBHOOK_SEC && echo
+APP_URL="https://<your-app>.onrender.com"
+
+curl -s -X POST "https://api.telegram.org/bot${BOT_TOKEN}/setWebhook" \
+  -d "url=${APP_URL}/webhook/telegram" \
+  -d "secret_token=${WEBHOOK_SEC}"
+
+unset BOT_TOKEN WEBHOOK_SEC
+```
+
+**Windows PowerShell:**
+```powershell
+$BotToken = Read-Host "Enter Telegram Bot Token" -AsSecureString
+$BSTR = [System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($BotToken)
+$PlainToken = [System.Runtime.InteropServices.Marshal]::PtrToStringAuto($BSTR)
+
+$Secret = Read-Host "Enter Webhook Secret"
+$AppUrl = "https://<your-app>.onrender.com"
+
+Invoke-RestMethod -Uri "https://api.telegram.org/bot$PlainToken/setWebhook" `
+  -Method Post `
+  -Body @{ url = "$AppUrl/webhook/telegram"; secret_token = $Secret }
 ```
 
 ### 3. Configure Free Schedulers on [cron-job.org](https://cron-job.org)
-*(Set Timezone to **Asia/Kolkata**)*
+*(Set Timezone to **Asia/Kolkata (IST)**)*
 
 | Job Name | Schedule | Target URL | Custom Headers |
 | :--- | :--- | :--- | :--- |
-| **Render Keep-Alive** | `*/10 * * * *` (Every 10 min) | `https://<your-app>.onrender.com/health` | *(None)* |
-| **Morning Digest** | `30 7 * * *` (Daily 7:30 AM IST) | `https://<your-app>.onrender.com/jobs/digest` | `X-Job-Secret: <JOB_SECRET>` |
-| **Email Poll** | `0 * * * *` (Hourly) | `https://<your-app>.onrender.com/jobs/poll-emails` | `X-Job-Secret: <JOB_SECRET>` |
+| **Keep-Alive Ping** | `*/10 * * * *` (Every 10 min) | `https://<your-app>.onrender.com/health` | *(None)* |
+| **Morning Digest** | `30 7 * * *` (Daily 7:30 AM IST) | `https://<your-app>.onrender.com/jobs/digest` | `X-Job-Secret: <YOUR_JOB_SECRET>` |
+| **Email Poll** | `0 * * * *` (Hourly) | `https://<your-app>.onrender.com/jobs/poll-emails` | `X-Job-Secret: <YOUR_JOB_SECRET>` |
 
 ---
 
 ## 🔒 Security & Privacy Guarantees
 
-* 🛡️ **Read-Only Scope (`gmail.readonly`):** The bot has no permission to delete, modify, or send emails on your behalf.
-* 🛡️ **Zero-Exposure Firewall:** The Telegram webhook strictly ignores and rejects any incoming messages that do not match your authenticated `TELEGRAM_CHAT_ID`.
+* 🛡️ **Read-Only Scope (`gmail.readonly`):** The application cannot alter, delete, draft, or send emails on your behalf.
+* 🛡️ **Zero-Exposure Firewall:** The Telegram webhook strictly filters updates, discarding any message or callback that does not originate from your authenticated `TELEGRAM_CHAT_ID`.
 * 🛡️ **Protected Cron Endpoints:** `/jobs/*` endpoints reject any request lacking the valid `X-Job-Secret` header with `403 Forbidden`.
-* 🛡️ **7-Day Auto-Purge:** MongoDB uses native TTL indexes (`expireAfterSeconds: 0`) to automatically purge email records after 7 days.
-* 🛡️ **Prompt Injection Defenses:** AI system prompts isolate email content as untrusted data, enforcing strict JSON output schemas.
-* 🛡️ **Token Redaction:** Passwords, OAuth tokens, and sensitive HTTP headers are automatically censored in all server logs.
+* 🛡️ **7-Day Auto-Purge:** MongoDB uses native TTL indexes (`expireAfterSeconds: 0`) to automatically purge processed records after 7 days.
+* 🛡️ **Zero Permanent Email Body Storage:** Only lightweight, sanitized metadata and brief snippets are temporarily cached for query resolution.
+* 🛡️ **Prompt Injection Defenses:** AI system prompts isolate email content as untrusted input, strictly enforcing structured JSON output validation.
+* 🛡️ **Structured Log Redaction:** OAuth tokens, passwords, and sensitive HTTP headers are automatically censored in Pino logs.
 
 ---
 
 <p align="center">
-  Built with ❤️ for intelligent, stress-free email productivity.
+  Built with ❤️ for intelligent, secure, and stress-free email productivity.
 </p>
